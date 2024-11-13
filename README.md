@@ -34,3 +34,36 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+## HOW TO START
+
+### Instal Node Module
+``` 
+npm i 
+
+yarn
+
+```
+
+### Migration Database
+```
+npx prisma migrate reset
+
+```
+
+### Dummy Level 
+```
+INSERT INTO `Level_Member` (`nama_level`, `minimal_point`)
+VALUES 
+    ('Bronze', 100.0),
+    ('Silver', 500.0),
+    ('Gold', 1000.0),
+    ('Platinum', 2000.0),
+    ('Diamond', 5000.0);
+
+
+
+```
+
+

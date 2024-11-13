@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Menu {
+  menu_id        Int    @id @default(autoincrement())
+  nama_menu      String @db.Text
+  deskripsi_menu String @db.Text
+  harga          Float
+  stok_menu      Int
+}
+
+model Pelanggan {
+  pelanggan_id   Int    @id @default(autoincrement())
+  level_id       Int
+  nama_pelanggan String @db.Text
+
+  level_member Level_Member @relation(fields: [level_id], references: [level_id])
+}
+
+model Level_Member {
+  level_id      Int    @id @default(autoincrement())
+  nama_level    String @db.Text
+  minimal_point Float
+
+  pelanggan Pelanggan[]
+}
+
+model Pegawai {
+  pegawai_id Int    @id @default(autoincrement())
+  nama       String @db.Text
+  akses_menu String @db.Text
+  username   String @unique
+  password   String
+}

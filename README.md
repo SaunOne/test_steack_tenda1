@@ -62,8 +62,10 @@ VALUES
     ('Platinum', 2000.0),
     ('Diamond', 5000.0);
 
-
+INSERT INTO `pegawai` (`pegawai_id`, `nama`, `akses_menu`, `username`, `password`) VALUES
+(1, 'mal', '2', 'user123', 'password123');
 
 ```
+
 
 

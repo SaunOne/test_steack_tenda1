@@ -3,14 +3,14 @@ import React from 'react';
 type TableColumn = {
     header: string;
     accessor: string;
-    render?: (row: any) => React.ReactNode; 
+    render?: (row: any) => React.ReactNode;
 };
 
 type DynamicTableProps = {
     columns: TableColumn[];
     data: Record<string, any>[];
-    onEdit: (id: number) => void;
-    onDelete: (id: number) => void;
+    onEdit?: (id: number) => void;
+    onDelete?: (id: number) => void;
     idAccessor: string;
 };
 
@@ -38,14 +38,24 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ columns, data, onEdit, onDe
                             ))}
                             <td className="p-2 border-b text-center space-x-2">
                                 <button
-                                    onClick={() => onEdit(row[idAccessor])}
-                                    className="px-2 py-1 bg-blue-500 text-white rounded-md"
+                                    onClick={() => onEdit && onEdit(row[idAccessor])}
+                                    disabled={!onEdit}
+                                    className={`px-2 py-1 rounded-md ${
+                                        onEdit
+                                            ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
                                 >
                                     Edit
                                 </button>
                                 <button
-                                    onClick={() => onDelete(row[idAccessor])}
-                                    className="px-2 py-1 bg-red-500 text-white rounded-md"
+                                    onClick={() => onDelete && onDelete(row[idAccessor])}
+                                    disabled={!onDelete}
+                                    className={`px-2 py-1 rounded-md ${
+                                        onDelete
+                                            ? 'bg-red-500 text-white hover:bg-red-600'
+                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
                                 >
                                     Delete
                                 </button>

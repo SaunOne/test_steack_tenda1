@@ -7,34 +7,76 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Menu {
-  menu_id        Int    @id @default(autoincrement())
-  nama_menu      String @db.Text
-  deskripsi_menu String @db.Text
-  harga          Float
-  stok_menu      Int
+
+
+model Pegawai {
+  pegawai_id Int     @id @default(autoincrement())
+  name       String  @db.Text
+  username   String  @unique
+  password   String  @db.Text
+  role_id    Int
+  deletedAt  DateTime? @db.DateTime
+
+  role Role @relation(fields: [role_id], references: [role_id])
+} 
+
+model Role {
+  role_id   Int      @id @default(autoincrement())
+  name      String   @db.Text
+  deletedAt DateTime? @db.DateTime
+
+  pegawai Pegawai[]
 }
 
 model Pelanggan {
-  pelanggan_id   Int    @id @default(autoincrement())
-  level_id       Int
-  nama_pelanggan String @db.Text
+  pelanggan_id Int      @id @default(autoincrement())
+  name         String   @db.Text
+  points       Int
+  deletedAt    DateTime? @db.DateTime
 
-  level_member Level_Member @relation(fields: [level_id], references: [level_id])
+  transaksi Transaksi[]
 }
 
-model Level_Member {
-  level_id      Int    @id @default(autoincrement())
-  nama_level    String @db.Text
-  minimal_point Float
-
-  pelanggan Pelanggan[]
+model Menu {
+  menu_id         Int               @id @default(autoincrement()) // Primary Key
+  name            String            @db.Text                    // Name of the menu, stored as TEXT in the database
+  description     String            @db.Text                    // Description, stored as TEXT
+  stok            Int               @db.Int                     // Stock quantity as an integer
+  price           Float             @db.Double                  // Price stored as DOUBLE
+  deletedAt       DateTime?         @db.DateTime                // Nullable field for soft deletes
+  detail_transaksi DetailTransaksi[]                            // Relation to DetailTransaksi
 }
 
-model Pegawai {
-  pegawai_id Int    @id @default(autoincrement())
-  nama       String @db.Text
-  akses_menu String @db.Text
-  username   String @unique
-  password   String
+
+model LevelMember {
+  level_member_id Int      @id @default(autoincrement())
+  name            String   @db.Text
+  diskon          Int
+  minimum_point   Int
+  deletedAt       DateTime? @db.DateTime
+
+  transaksi Transaksi[]
+}
+
+model Transaksi {
+  transaksi_id      Int           @id @default(autoincrement())
+  pelanggan_id      Int
+  diskon_id         Int?
+  tanggal_transaksi DateTime      @db.DateTime
+  total_harga       Float
+  deletedAt         DateTime?     @db.DateTime
+
+  pelanggan Pelanggan  @relation(fields: [pelanggan_id], references: [pelanggan_id])
+  diskon    LevelMember? @relation(fields: [diskon_id], references: [level_member_id])
+  detail_transaksi DetailTransaksi[]
+}
+
+model DetailTransaksi {
+  detail_transaksi_id Int @id @default(autoincrement())
+  transaksi_id        Int
+  menu_id             Int
+  amount              Int
+
+  transaksi Transaksi @relation(fields: [transaksi_id], references: [transaksi_id])
+  menu      Menu      @relation(fields: [menu_id], references: [menu_id])
 }

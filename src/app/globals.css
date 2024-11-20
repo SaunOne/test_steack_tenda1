@@ -3,19 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background-color: #ffffff; /* Putih */
+  --text-color: #000000; /* Hitam */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background-color: #ffffff; /* Tetap putih */
+    --text-color: #000000; /* Tetap hitam */
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
+
+html, body {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+

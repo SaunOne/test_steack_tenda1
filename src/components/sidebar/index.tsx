@@ -10,6 +10,7 @@ const Sidebar: React.FC = () => {
         { name: "Kelola Data Transaksi", path: "/transaksi" },
         { name: "Kelola Data Customer", path: "/customer" },
         { name: "Kelola Data Menu", path: "/menu" },
+        { name: "Kelola Data Pegawai", path: "/pegawai" },
         { name: "Kelola Level", path: "/level" },
     ];
 

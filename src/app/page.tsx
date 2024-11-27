@@ -36,6 +36,7 @@ const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
+  
 
   const handleLogout = useCallback(() => {
     if (typeof window !== 'undefined') {
@@ -54,6 +55,9 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    const loginStatus = localStorage?.getItem("isLoginSuccess");
+    const isUserLoggedIn = loginStatus === "true";
+    setIsLoggedIn(isUserLoggedIn);
     const fetchData = async () => {
       try {
         const [customersRes, productsRes, levelsRes] = await Promise.all([
@@ -127,7 +131,7 @@ const HomePage = () => {
           {levelMember.length > 0 && (
             <div>
               <h2 className="text-3xl font-bold text-start mb-6">Level Members</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {levelMember.map((level, index) => (
                   <div
                     key={level.level_member_id}

@@ -1,47 +1,55 @@
 'use client';
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import "./globals.css";
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Sidebar from "@/components/sidebar";
 import Navbar from "@/components/navbar";
-import { useEffect, useState } from "react";
 import ToastProvider from "@/components/toast/toastprovider";
+import "./globals.css";
 
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+  const [isCheckingLogin, setIsCheckingLogin] = useState(true); // State untuk loading
+  const router = useRouter();
+  const pathname = usePathname(); // Mendapatkan path saat ini
+
   useEffect(() => {
-    const loginStatus = localStorage.getItem("isLoginSuccess");
-    setIsLoggedIn(loginStatus === "true");
-  }, []);
+    try {
+      const loginStatus = localStorage?.getItem("isLoginSuccess");
+      const isUserLoggedIn = loginStatus === "true";
+      setIsLoggedIn(isUserLoggedIn);
+
+      if (!isUserLoggedIn && pathname !== "/auth/login") {
+        router.push("/auth/login");
+      }
+    } catch (error) {
+      console.error("Error accessing localStorage:", error);
+    } finally {
+      setIsCheckingLogin(false);
+    }
+  }, [router, pathname]);
+
+  // Tampilkan spinner saat masih mengecek status login
+  if (isCheckingLogin) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  // Jangan tampilkan Sidebar dan Navbar pada path "/"
+  const showLayout = isLoggedIn && pathname !== "/";
 
   return (
     <html lang="en">
       <body className="antialiased">
         <div className="flex min-h-screen">
-          {isLoggedIn && <Sidebar />}
+          {showLayout && <Sidebar />}
           <div className="flex flex-col flex-grow">
-          {isLoggedIn && <Navbar />}
-            <main>{children}</main>
+            {showLayout && <Navbar />}
+            <main className="flex-grow overflow-y-auto p-4">{children}</main>
           </div>
         </div>
-        {/* Tambahkan ToastProvider */}
         <ToastProvider />
       </body>
     </html>

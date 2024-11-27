@@ -1,7 +1,14 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+module.exports = {
+  experimental: {
+    appDir: true, // Enable App Directory
+  },
+  async redirects() {
+    return [
+      {
+        source: '/app/pages/:path*',
+        destination: '/api/:path*',
+        permanent: false,
+      },
+    ];
+  },
 };
-
-export default nextConfig;

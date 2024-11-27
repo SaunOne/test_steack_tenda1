@@ -2,6 +2,7 @@
 'use client'
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Adjusted for Next.js's latest router API
+import toast from 'react-hot-toast';
 
 export default function Login() {
   const [username, setUsername] = useState<string>('');
@@ -30,12 +31,14 @@ export default function Login() {
         // Save the token in local storage
         localStorage.setItem("isLoginSuccess", "true");
         console.log('Login successful:', data);
-
+        toast.success('Login Berhasil!');
         // Redirect to the dashboard on successful login
-        router.push('/dashboard');
+        router.push('/home');
+    
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'Invalid username or password.');
+        toast.error('Invalid Username dan Password!');
       }
     } catch (err) {
       console.error('Login error:', err);

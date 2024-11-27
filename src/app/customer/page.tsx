@@ -8,8 +8,10 @@ type Customer = {
   pelanggan_id?: number; // Primary Key dari Prisma Schema
   name: string; // Nama Pelanggan
   points: number; // Poin Pelanggan
+  levelMemberName?: string; // Nama Level Member
   index?: number; // Untuk keperluan tampilan (No urut)
 };
+
 
 const CustomerPage = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -26,20 +28,27 @@ const CustomerPage = () => {
     { header: 'No', accessor: 'index' },
     { header: 'Nama Pelanggan', accessor: 'name' },
     { header: 'Poin', accessor: 'points' },
+    { header: 'Level Member', accessor: 'levelMemberName' }, // Kolom baru
   ];
+  
 
   // Fetch data dari API
   const fetchData = async () => {
     try {
       const response = await fetch('/api/pelanggan'); // Endpoint API
-      const data: Customer[] = await response.json();
-      const customersWithIndex = data.map((item, index) => ({ ...item, index: index + 1 }));
+      const data = await response.json();
+      const customersWithIndex = data.map((item: any, index: number) => ({
+        ...item,
+        index: index + 1,
+        levelMemberName: item.levelMember?.name || 'Tidak ada', // Ambil nama level member
+      }));
       setCustomers(customersWithIndex);
       setFilteredCustomers(customersWithIndex);
     } catch (error) {
       console.error('Failed to fetch customers:', error);
     }
   };
+  
 
   // Trigger fetch saat komponen di-mount
   useEffect(() => {

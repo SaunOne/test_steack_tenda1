@@ -16,9 +16,9 @@ const Sidebar: React.FC = () => {
 
     return (
         <div className="flex flex-col max-w-64 min-h-screen h-full">
-            <div className="bg-red-700 p-6 border-r text-white font-bold">
+            <a href='/' className="bg-red-700 p-6 border-r text-white font-bold">
                 Steak Tenda 2
-            </div>
+            </a>
             <div className="bg-yellow-100 p-4 flex-grow">
                 <ul className="space-y-2">
                     {menuItems.map((item) => (

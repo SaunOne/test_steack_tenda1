@@ -10,11 +10,17 @@ const methods: Record<
   GET: async (req, res) => {
     try {
       const customers = await prisma.pelanggan.findMany({
-        where: { deletedAt: null },
+        include: {
+          levelMember: { // Include nama level member
+            select: { name: true },
+          },
+        },
       });
+
       res.status(200).json(customers);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch customers" });
+      console.error('Failed to fetch customers:', error);
+      res.status(500).json({ error: 'Failed to fetch customers' });
     }
   },
 

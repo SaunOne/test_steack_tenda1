@@ -38,8 +38,8 @@ const TransactionPage = () => {
   const [totalDiskon, setTotalDiskon] = useState<number>(0); // Total diskon
   const [totalHarga, setTotalHarga] = useState<number>(0); // Total harga setelah diskon
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-    const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
-    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
 
@@ -60,6 +60,18 @@ const TransactionPage = () => {
       setFilteredTransactions(transactionsWithIndex);
     } catch (error) {
       console.error('Failed to fetch transactions:', error);
+    }
+  };
+
+  const fetchTransactionDetails = async (transaksiId: number) => {
+    try {
+      const response = await fetch(`/api/transaksi?transaksi_id=${transaksiId}`);
+      const data = await response.json();
+      setSelectedTransaction(data);
+      setIsReceiptModalOpen(true);
+    } catch (error) {
+      console.error('Failed to fetch transaction details:', error);
+      toast.error('Gagal mengambil detail transaksi');
     }
   };
 
@@ -190,8 +202,8 @@ const TransactionPage = () => {
     }
   };
 
-  const handlePrintReceipt = (transaction: Transaction) => {
-    setSelectedTransaction(transaction);
+  const handlePrintReceipt = (transaksiId: number) => {
+    fetchTransactionDetails(transaksiId);
     setIsReceiptModalOpen(true);
   };
 
@@ -249,7 +261,7 @@ const TransactionPage = () => {
           ...transaction,
           actions: (
             <button
-              onClick={() => handlePrintReceipt(transaction)}
+                onClick={() => handlePrintReceipt(transaction?.transaksi_id ?? 0)}
               className="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-600"
             >
               Cetak Nota
@@ -321,50 +333,73 @@ const TransactionPage = () => {
         </div>
       )}
         {isReceiptModalOpen && selectedTransaction && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-lg w-[600px] p-6">
-            <h2 className="text-lg font-semibold mb-4">Nota Transaksi</h2>
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white rounded-lg shadow-lg w-[600px] p-6">
+      <h2 className="text-lg font-semibold mb-4">Nota Transaksi</h2>
+      <p>
+        <strong>Pelanggan:</strong> {selectedTransaction?.pelanggan.name}
+      </p>
+      <p>
+        <strong>Tanggal:</strong> {new Date(selectedTransaction.tanggal_transaksi).toLocaleDateString('id-ID')}
+      </p>
+      <hr className="my-4" />
+      <h3 className="text-md font-semibold mb-2">Detail Pesanan</h3>
+      <ul className="list-disc pl-6">
+            {selectedTransaction?.detail_transaksi?.map((detail, index) => (
+            <li key={index} className="flex justify-between">
+                <span>
+                {detail.menu.name} x{detail.amount}
+                </span>
+                <span>Rp{(detail.menu.price * detail.amount).toLocaleString()}</span>
+            </li>
+            ))}
+        </ul>
+        <hr className="my-4" />
+        <div className="text-right">
             <p>
-                <strong>Pelanggan:</strong> {selectedTransaction.pelanggan_name}
+            <strong>Subtotal:</strong>{' '}
+            Rp{selectedTransaction?.detail_transaksi
+                ?.reduce((sum, detail) => sum + detail.menu.price * detail.amount, 0)
+                .toLocaleString()}
             </p>
-            <p>
-                <strong>Tanggal:</strong> {selectedTransaction.tanggal_transaksi}
-            </p>
-            <hr className="my-4" />
-            <h3 className="text-md font-semibold mb-2">Detail Pesanan</h3>
-            {/* <ul className="list-disc pl-6">
-                {selectedTransaction.menu.map((item) => (
-                <li key={item.id_menu} className="flex justify-between">
-                    <span>
-                    {item.name} x{item.amount}
-                    </span>
-                    <span>Rp{item.subtotal.toLocaleString()}</span>
-                </li>
-                ))}
-            </ul> */}
-            <hr className="my-4" />
-            <div className="text-right">
+            {selectedTransaction.diskon && (
+            <>
                 <p>
-                <strong>Total Harga:</strong> Rp{selectedTransaction.total_harga?.toLocaleString()}
+                <strong>Diskon ({selectedTransaction.diskon}%):</strong>{' '}
+                Rp{(
+                    (selectedTransaction.diskon / 100.0) *
+                    selectedTransaction.detail_transaksi?.reduce(
+                    (sum, detail) => sum + detail.menu.price * detail.amount,
+                    0
+                    )
+                ).toLocaleString()}
                 </p>
-            </div>
-            <div className="flex justify-end space-x-3 mt-6">
-                <button
-                onClick={() => setIsReceiptModalOpen(false)}
-                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
-                >
-                Tutup
-                </button>
-                <button
-                onClick={() => window.print()}
-                className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
-                >
-                Cetak
-                </button>
-            </div>
-            </div>
+            </>
+            )}
+            <p className="font-bold">
+            <strong>Total Setelah Diskon:</strong>{' '}
+            Rp{selectedTransaction.total_harga?.toLocaleString()}
+            </p>
         </div>
-        )}
+        <div className="flex justify-end space-x-3 mt-6">
+            <button
+            onClick={() => setIsReceiptModalOpen(false)}
+            className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
+            >
+            Tutup
+            </button>
+            <button
+            onClick={() => window.print()}
+            className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+            >
+            Cetak
+            </button>
+        </div>
+        </div>
+    </div>
+    )}
+
+
          {isDeleteConfirmOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg w-[400px] p-6">

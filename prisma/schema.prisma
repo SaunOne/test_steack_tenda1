@@ -12,13 +12,15 @@ datasource db {
 model Pegawai {
   pegawai_id Int     @id @default(autoincrement())
   name       String  @db.Text
-  username   String  @unique
+  username   String  @unique @db.VarChar(255) // Ganti TEXT dengan VARCHAR
   password   String  @db.Text
   role_id    Int
   deletedAt  DateTime? @db.DateTime
 
   role Role @relation(fields: [role_id], references: [role_id])
-} 
+}
+
+
 
 model Role {
   role_id   Int      @id @default(autoincrement())
@@ -29,12 +31,15 @@ model Role {
 }
 
 model Pelanggan {
-  pelanggan_id Int      @id @default(autoincrement())
-  name         String   @db.Text
-  points       Int
-  deletedAt    DateTime? @db.DateTime
+  pelanggan_id   Int          @id @default(autoincrement())
+  name           String       @db.Text
+  points         Int
+  deletedAt      DateTime?    @db.DateTime
 
-  transaksi Transaksi[]
+  level_member_id Int?        // Foreign key ke LevelMember (nullable)
+  levelMember     LevelMember? @relation(fields: [level_member_id], references: [level_member_id])
+
+  transaksi       Transaksi[]
 }
 
 model Menu {
@@ -49,25 +54,25 @@ model Menu {
 
 
 model LevelMember {
-  level_member_id Int      @id @default(autoincrement())
-  name            String   @db.Text
+  level_member_id Int          @id @default(autoincrement())
+  name            String       @db.Text
   diskon          Int
   minimum_point   Int
-  deletedAt       DateTime? @db.DateTime
+  deletedAt       DateTime?    @db.DateTime
 
-  transaksi Transaksi[]
+  pelanggan       Pelanggan[]  // Relasi ke Pelanggan (one-to-many)
 }
 
 model Transaksi {
   transaksi_id      Int           @id @default(autoincrement())
   pelanggan_id      Int
-  diskon_id         Int?
+  diskon            Float?
   tanggal_transaksi DateTime      @db.DateTime
+  total_diskon      Int           @default(0)
   total_harga       Float
   deletedAt         DateTime?     @db.DateTime
 
   pelanggan Pelanggan  @relation(fields: [pelanggan_id], references: [pelanggan_id])
-  diskon    LevelMember? @relation(fields: [diskon_id], references: [level_member_id])
   detail_transaksi DetailTransaksi[]
 }
 

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Sidebar from "@/components/sidebar";
@@ -6,7 +6,11 @@ import Navbar from "@/components/navbar";
 import ToastProvider from "@/components/toast/toastprovider";
 import "./globals.css";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isCheckingLogin, setIsCheckingLogin] = useState(true); // State untuk loading
   const router = useRouter();
@@ -47,11 +51,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {showLayout && <Sidebar />}
           <div className="flex flex-col flex-grow">
             {showLayout && <Navbar />}
-            <main className="flex-grow overflow-y-auto p-4">{children}</main>
+            <main className="flex-grow overflow-y-auto p-4 h-[200rem]"></main>
+            {children}
           </div>
         </div>
         <ToastProvider />
       </body>
+      {/* <script src="./node_modules/preline/dist/preline.js"></script> */}
     </html>
   );
 }

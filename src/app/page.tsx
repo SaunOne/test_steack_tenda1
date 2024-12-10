@@ -1,9 +1,15 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
-import { toast } from 'react-hot-toast';
-import { FaUserCircle, FaShoppingCart, FaStar, FaGift, FaPercentage } from 'react-icons/fa';
+import { useRouter } from "next/navigation";
+import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import {
+  FaUserCircle,
+  FaShoppingCart,
+  FaStar,
+  FaGift,
+  FaPercentage,
+} from "react-icons/fa";
 
 type Customer = {
   pelanggan_id: number;
@@ -36,12 +42,11 @@ const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  
 
   const handleLogout = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('isLoginSuccess', 'false');
-      router.push('/');
+    if (typeof window !== "undefined") {
+      localStorage.setItem("isLoginSuccess", "false");
+      router.push("/");
       window.location.reload();
     }
   }, [router]);
@@ -61,9 +66,9 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         const [customersRes, productsRes, levelsRes] = await Promise.all([
-          fetch('/api/home'),
-          fetch('/api/menu'),
-          fetch('/api/level_member'),
+          fetch("/api/home"),
+          fetch("/api/menu"),
+          fetch("/api/level_member"),
         ]);
 
         const customers = await customersRes.json();
@@ -74,8 +79,8 @@ const HomePage = () => {
         setProducts(products);
         setLevelMember(levels);
       } catch (error) {
-        console.error('Failed to fetch data:', error);
-        toast.error('Failed to load data.');
+        console.error("Failed to fetch data:", error);
+        toast.error("Failed to load data.");
       }
     };
 
@@ -102,7 +107,7 @@ const HomePage = () => {
             <button
               onClick={() => {
                 setIsLoggedIn(true);
-                router.push('/dashboard');
+                router.push("/dashboard");
               }}
               className="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg font-semibold"
             >
@@ -114,7 +119,9 @@ const HomePage = () => {
 
       {/* Hero Section */}
       <div className="mt-2 bg-gradient-to-r from-red-600 to-yellow-500 text-white py-20 px-10 rounded-b-3xl shadow-lg relative overflow-hidden">
-        <h1 className="text-5xl font-extrabold mb-4 animate-pulse">Welcome to SteakTenda</h1>
+        <h1 className="text-5xl font-extrabold mb-4 animate-pulse">
+          Welcome to SteakTenda
+        </h1>
         <p className="text-xl font-medium">
           Your trusted partner for quality products and services.
         </p>
@@ -130,7 +137,9 @@ const HomePage = () => {
           {/* Level Members */}
           {levelMember.length > 0 && (
             <div>
-              <h2 className="text-3xl font-bold text-start mb-6">Level Members</h2>
+              <h2 className="text-3xl font-bold text-start mb-6">
+                Level Members
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {levelMember.map((level, index) => (
                   <div
@@ -138,15 +147,23 @@ const HomePage = () => {
                     className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transform hover:scale-105 transition-transform duration-200 border border-gray-200"
                   >
                     <div className="bg-red-100 text-red-600 p-4 rounded-full mb-4">
-                      {index % 2 === 0 ? <FaStar size={30} /> : <FaGift size={30} />}
+                      {index % 2 === 0 ? (
+                        <FaStar size={30} />
+                      ) : (
+                        <FaGift size={30} />
+                      )}
                     </div>
                     <div className="text-center">
                       <h3 className="text-xl font-bold mb-2">{level.name}</h3>
                       <p className="text-sm text-gray-500 mb-2">
-                        Diskon: <span className="font-semibold">{level.diskon}%</span>
+                        Diskon:{" "}
+                        <span className="font-semibold">{level.diskon}%</span>
                       </p>
                       <p className="text-sm text-gray-500">
-                        Minimum Poin: <span className="font-semibold">{level.minimum_point}</span>
+                        Minimum Poin:{" "}
+                        <span className="font-semibold">
+                          {level.minimum_point}
+                        </span>
                       </p>
                     </div>
                   </div>
@@ -157,7 +174,9 @@ const HomePage = () => {
 
           {/* Top Customers */}
           <div>
-            <h2 className="text-3xl font-bold text-start mb-6">Top Customers</h2>
+            <h2 className="text-3xl font-bold text-start mb-6">
+              Top Customers
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {topCustomers.map((customer) => (
                 <div
@@ -166,9 +185,12 @@ const HomePage = () => {
                 >
                   <FaUserCircle className="text-red-600 text-5xl" />
                   <div>
-                    <h3 className="text-2xl font-bold text-red-700">{customer.name}</h3>
+                    <h3 className="text-2xl font-bold text-red-700">
+                      {customer.name}
+                    </h3>
                     <p className="text-lg text-gray-700">
-                      Points: <span className="font-semibold">{customer.points}</span>
+                      Points:{" "}
+                      <span className="font-semibold">{customer.points}</span>
                     </p>
                   </div>
                 </div>
@@ -193,8 +215,12 @@ const HomePage = () => {
                   className="w-full h-40 object-cover"
                 />
                 <div className="p-4">
-                  <h3 className="text-xl font-bold text-red-700">{product.name}</h3>
-                  <p className="text-sm text-gray-500 mb-2">{product.description}</p>
+                  <h3 className="text-xl font-bold text-red-700">
+                    {product.name}
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-2">
+                    {product.description}
+                  </p>
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold text-red-600">
                       Rp {product.price.toLocaleString()}

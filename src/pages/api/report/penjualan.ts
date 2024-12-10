@@ -74,15 +74,19 @@ export default async function handler(
         totalTransactions: 0,
         totalRevenue: 0,
         totalDiscount: 0,
-        items: {},
+        items: {} as {
+          [key: number]: { name: string; amount: number; revenue: number };
+        },
       }
     );
 
     res.status(200).json(summary);
   } catch (error) {
     console.error(error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     res
       .status(500)
-      .json({ message: "Internal server error", error: error.message });
+      .json({ message: "Internal server error", error: errorMessage });
   }
 }

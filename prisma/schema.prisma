@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -15,7 +15,7 @@ model Pegawai {
   username   String  @unique @db.VarChar(255) // Ganti TEXT dengan VARCHAR
   password   String  @db.Text
   role_id    Int
-  deletedAt  DateTime? @db.DateTime
+  deletedAt  DateTime?
 
   role Role @relation(fields: [role_id], references: [role_id])
 }
@@ -25,7 +25,7 @@ model Pegawai {
 model Role {
   role_id   Int      @id @default(autoincrement())
   name      String   @db.Text
-  deletedAt DateTime? @db.DateTime
+  deletedAt DateTime?
 
   pegawai Pegawai[]
 }
@@ -34,7 +34,7 @@ model Pelanggan {
   pelanggan_id   Int          @id @default(autoincrement())
   name           String       @db.Text
   points         Int
-  deletedAt      DateTime?    @db.DateTime
+  deletedAt      DateTime?
 
   level_member_id Int?        // Foreign key ke LevelMember (nullable)
   levelMember     LevelMember? @relation(fields: [level_member_id], references: [level_member_id])
@@ -46,9 +46,9 @@ model Menu {
   menu_id         Int               @id @default(autoincrement()) // Primary Key
   name            String            @db.Text                    // Name of the menu, stored as TEXT in the database
   description     String            @db.Text                    // Description, stored as TEXT
-  stok            Int               @db.Int                     // Stock quantity as an integer
-  price           Float             @db.Double                  // Price stored as DOUBLE
-  deletedAt       DateTime?         @db.DateTime                // Nullable field for soft deletes
+  stok            Int                                          // Stock quantity as an integer
+  price           Float                                        // Price stored as DOUBLE
+  deletedAt       DateTime?                                   // Nullable field for soft deletes
   detail_transaksi DetailTransaksi[]                            // Relation to DetailTransaksi
 }
 
@@ -58,7 +58,7 @@ model LevelMember {
   name            String       @db.Text
   diskon          Int
   minimum_point   Int
-  deletedAt       DateTime?    @db.DateTime
+  deletedAt       DateTime?
 
   pelanggan       Pelanggan[]  // Relasi ke Pelanggan (one-to-many)
 }
@@ -67,10 +67,10 @@ model Transaksi {
   transaksi_id      Int           @id @default(autoincrement())
   pelanggan_id      Int
   diskon            Float?
-  tanggal_transaksi DateTime      @db.DateTime
+  tanggal_transaksi DateTime
   total_diskon      Int           @default(0)
   total_harga       Float
-  deletedAt         DateTime?     @db.DateTime
+  deletedAt         DateTime?
 
   pelanggan Pelanggan  @relation(fields: [pelanggan_id], references: [pelanggan_id])
   detail_transaksi DetailTransaksi[]

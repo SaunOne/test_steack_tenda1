@@ -1,13 +1,13 @@
 // pages/login.tsx
-'use client'
-import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Adjusted for Next.js's latest router API
-import toast from 'react-hot-toast';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation"; // Adjusted for Next.js's latest router API
+import toast from "react-hot-toast";
 
 export default function Login() {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -15,34 +15,33 @@ export default function Login() {
 
     try {
       // Send login request to API
-     
-      const response = await fetch('/api/auth', {
-        method: 'POST',
+
+      const response = await fetch("/api/auth", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
       });
-    
+
       console.log(response);
       if (response.ok) {
         const data = await response.json();
-        
+
         // Save the token in local storage
         localStorage.setItem("isLoginSuccess", "true");
-        console.log('Login successful:', data);
-        toast.success('Login Berhasil!');
+        console.log("Login successful:", data);
+        toast.success("Login Berhasil!");
         // Redirect to the dashboard on successful login
-        router.push('/home');
-    
+        router.push("/home");
       } else {
         const errorData = await response.json();
-        setError(errorData.error || 'Invalid username or password.');
-        toast.error('Invalid Username dan Password!');
+        setError(errorData.error || "Invalid username or password.");
+        toast.error("Invalid Username dan Password!");
       }
     } catch (err) {
-      console.error('Login error:', err);
-      setError('An error occurred. Please try again.');
+      console.error("Login error:", err);
+      setError("An error occurred. Please try again.");
     }
   };
 
@@ -56,14 +55,19 @@ export default function Login() {
       {/* Login Form */}
       <main className="flex-grow flex items-center justify-center bg-gray-100">
         <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold text-center text-red-700 mb-6">Login</h2>
+          <h2 className="text-2xl font-bold text-center text-red-700 mb-6">
+            Login
+          </h2>
 
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
           <form onSubmit={handleSubmit}>
             {/* Username Field */}
             <div className="mb-4">
-              <label htmlFor="username" className="block text-gray-700 font-semibold mb-2">
+              <label
+                htmlFor="username"
+                className="block text-gray-700 font-semibold mb-2"
+              >
                 Username
               </label>
               <input
@@ -78,7 +82,10 @@ export default function Login() {
 
             {/* Password Field */}
             <div className="mb-6">
-              <label htmlFor="password" className="block text-gray-700 font-semibold mb-2">
+              <label
+                htmlFor="password"
+                className="block text-gray-700 font-semibold mb-2"
+              >
                 Password
               </label>
               <input

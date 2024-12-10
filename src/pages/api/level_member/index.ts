@@ -13,9 +13,10 @@ export default async function handler(
     // Get all level members
     case "GET":
       try {
-        const levelMembers = await prisma.levelMember.findMany({
-          where: { deletedAt: null },
-        });
+        const levelMembers =
+          (await prisma.levelMember.findMany({
+            where: { deletedAt: null },
+          })) || [];
         return res.status(200).json(levelMembers);
       } catch (error) {
         console.error("Failed to fetch level members:", error);

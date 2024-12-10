@@ -12,45 +12,44 @@ const methods: Record<
     const { username, password } = req.body;
     console.log("req.body", req.body);
     try {
-    const pegawai = await prisma.pegawai.findUnique({
-      where: { username },
-    });
-    if (!pegawai) {
-      return res.status(401).json({ error: "Invalid username or password" });
+      const pegawai = await prisma.pegawai.findUnique({
+        where: { username },
+      });
+      if (!pegawai) {
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      // const isPasswordCorrect = password === pegawai.password;
+
+      // if (!isPasswordCorrect) {
+      //   return res.status(401).json({ error: "Invalid username or password" });
+      // }
+
+      if (password !== pegawai.password) {
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      // const token = jwt.sign(
+      //   {
+      //     pegawai_id: pegawai.pegawai_id,
+      //     nama: pegawai.nama,
+      //     akses_menu: pegawai.akses_menu,
+      //   },
+      //   process.env.JWT_SECRET as string,
+      //   { expiresIn: "1h" }
+      // );
+
+      res.status(200).json({
+        message: "Login successful",
+        pegawai: {
+          pegawai_id: pegawai.pegawai_id ?? "",
+          name: pegawai.name ?? "",
+        },
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
-
-    // const isPasswordCorrect = password === pegawai.password;
-
-    // if (!isPasswordCorrect) {
-    //   return res.status(401).json({ error: "Invalid username or password" });
-    // }
-
-    if(password !== pegawai.password) {
-      return res.status(401).json({ error: "Invalid username or password" });
-    }
-
-    // const token = jwt.sign(
-    //   {
-    //     pegawai_id: pegawai.pegawai_id,
-    //     nama: pegawai.nama,
-    //     akses_menu: pegawai.akses_menu,
-    //   },
-    //   process.env.JWT_SECRET as string,
-    //   { expiresIn: "1h" }
-    // );
-    
-    res.status(200).json({
-      message: "Login successful",
-      pegawai: {
-        pegawai_id: pegawai.pegawai_id,
-        nama: pegawai.nama,
-        akses_menu: pegawai.akses_menu,
-      },
-    });
-  } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
   },
 };
 

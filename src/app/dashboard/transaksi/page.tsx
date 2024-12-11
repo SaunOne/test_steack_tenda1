@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import SearchBar from "@/components/searchbar";
 import DynamicTable from "@/components/table/transaksi";
 import { toast } from "react-hot-toast";
+import ProtectedRoute from "@/components/protectedRoutes";
 
 type MenuItem = {
   id_menu: number;
@@ -298,207 +299,214 @@ const TransactionPage = () => {
   }, [newTransaction.menu, diskonRate]);
 
   return (
-    <div className="p-6">
-      <SearchBar onSearch={handleSearch} onAdd={handleAddTransaction} />
-      <DynamicTable
-        onDelete={handleDelete}
-        idAccessor="transaksi_id"
-        columns={transactionColumns}
-        data={filteredTransactions.map((transaction) => ({
-          ...transaction,
-          actions: (
-            <button
-              onClick={() => handlePrintReceipt(transaction?.transaksi_id ?? 0)}
-              className="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-600"
-            >
-              Cetak Nota
-            </button>
-          ),
-        }))}
-      />
+    <ProtectedRoute allowedRoles={["kasir", "owner"]}>
+      <div className="p-6">
+        <SearchBar onSearch={handleSearch} onAdd={handleAddTransaction} />
+        <DynamicTable
+          onDelete={handleDelete}
+          idAccessor="transaksi_id"
+          columns={transactionColumns}
+          data={filteredTransactions.map((transaction) => ({
+            ...transaction,
+            actions: (
+              <button
+                onClick={() =>
+                  handlePrintReceipt(transaction?.transaksi_id ?? 0)
+                }
+                className="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-600"
+              >
+                Cetak Nota
+              </button>
+            ),
+          }))}
+        />
 
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg w-[800px] p-6">
-            <h2 className="text-lg font-semibold mb-4">Tambah Transaksi</h2>
-            <select
-              className="w-full p-2 mb-4 border rounded"
-              value={newTransaction.pelanggan_id}
-              onChange={(e) => handlePelangganChange(parseInt(e.target.value))}
-            >
-              <option value="">Pilih Pelanggan</option>
-              {customers.map((customer) => (
-                <option
-                  key={customer.pelanggan_id}
-                  value={customer.pelanggan_id}
-                >
-                  {customer.name}
-                </option>
-              ))}
-            </select>
+        {isModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg w-[800px] p-6">
+              <h2 className="text-lg font-semibold mb-4">Tambah Transaksi</h2>
+              <select
+                className="w-full p-2 mb-4 border rounded"
+                value={newTransaction.pelanggan_id}
+                onChange={(e) =>
+                  handlePelangganChange(parseInt(e.target.value))
+                }
+              >
+                <option value="">Pilih Pelanggan</option>
+                {customers.map((customer) => (
+                  <option
+                    key={customer.pelanggan_id}
+                    value={customer.pelanggan_id}
+                  >
+                    {customer.name}
+                  </option>
+                ))}
+              </select>
 
-            <div className="grid grid-cols-2 gap-4">
-              {menus.map((menu) => (
-                <div
-                  key={menu.menu_id}
-                  className={`border rounded-md p-4 shadow ${
-                    selectedMenuIds.includes(menu.menu_id)
-                      ? "bg-blue-100 border-blue-500"
-                      : ""
-                  } hover:shadow-lg cursor-pointer`}
-                  onClick={() => handleAddMenuItem(menu)}
-                >
-                  <h3 className="font-semibold">{menu.name}</h3>
-                  <p>{menu.description}</p>
-                  <p className="text-green-500">
-                    Rp{menu.price.toLocaleString()}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <h3 className="mt-6 mb-2">Keranjang</h3>
-            <ul className="list-disc pl-6">
-              {newTransaction.menu.map((item) => (
-                <li key={item.id_menu} className="flex justify-between">
-                  <span>{item.name}</span>
-                  <div>
-                    <span>{item.amount}x</span> ={" "}
-                    <span>Rp{item.subtotal.toLocaleString()}</span>
+              <div className="grid grid-cols-2 gap-4">
+                {menus.map((menu) => (
+                  <div
+                    key={menu.menu_id}
+                    className={`border rounded-md p-4 shadow ${
+                      selectedMenuIds.includes(menu.menu_id)
+                        ? "bg-blue-100 border-blue-500"
+                        : ""
+                    } hover:shadow-lg cursor-pointer`}
+                    onClick={() => handleAddMenuItem(menu)}
+                  >
+                    <h3 className="font-semibold">{menu.name}</h3>
+                    <p>{menu.description}</p>
+                    <p className="text-green-500">
+                      Rp{menu.price.toLocaleString()}
+                    </p>
                   </div>
-                </li>
-              ))}
-            </ul>
+                ))}
+              </div>
 
-            <div className="mt-4 text-right">
-              <p>
-                Total Harga: Rp
-                {newTransaction.menu
-                  .reduce((sum, item) => sum + item.subtotal, 0)
-                  .toLocaleString()}
-              </p>
-              <p>Diskon: Rp{totalDiskon.toLocaleString()}</p>
-              <p className="font-bold">
-                Total Setelah Diskon: Rp{totalHarga.toLocaleString()}
-              </p>
-            </div>
+              <h3 className="mt-6 mb-2">Keranjang</h3>
+              <ul className="list-disc pl-6">
+                {newTransaction.menu.map((item) => (
+                  <li key={item.id_menu} className="flex justify-between">
+                    <span>{item.name}</span>
+                    <div>
+                      <span>{item.amount}x</span> ={" "}
+                      <span>Rp{item.subtotal.toLocaleString()}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
 
-            <div className="flex justify-end space-x-3 mt-6">
-              <button
-                onClick={handleModalClose}
-                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleModalSubmit()}
-                className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
-              >
-                Simpan
-              </button>
+              <div className="mt-4 text-right">
+                <p>
+                  Total Harga: Rp
+                  {newTransaction.menu
+                    .reduce((sum, item) => sum + item.subtotal, 0)
+                    .toLocaleString()}
+                </p>
+                <p>Diskon: Rp{totalDiskon.toLocaleString()}</p>
+                <p className="font-bold">
+                  Total Setelah Diskon: Rp{totalHarga.toLocaleString()}
+                </p>
+              </div>
+
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={handleModalClose}
+                  className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleModalSubmit()}
+                  className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                >
+                  Simpan
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-      {isReceiptModalOpen && selectedTransaction && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg w-[600px] p-6">
-            <h2 className="text-lg font-semibold mb-4">Nota Transaksi</h2>
-            {/* <p>
+        )}
+        {isReceiptModalOpen && selectedTransaction && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg w-[600px] p-6">
+              <h2 className="text-lg font-semibold mb-4">Nota Transaksi</h2>
+              {/* <p>
               <strong>Pelanggan:</strong> {selectedTransaction?.pelanggan.name}
             </p> */}
-            <p>
-              <strong>Tanggal:</strong>{" "}
-              {new Date(
-                selectedTransaction?.tanggal_transaksi ?? ""
-              ).toLocaleDateString("id-ID")}
-            </p>
-            <hr className="my-4" />
-            <h3 className="text-md font-semibold mb-2">Detail Pesanan</h3>
-            <ul className="list-disc pl-6">
-              {selectedTransaction?.detail_transaksi?.map((detail, index) => (
-                <li key={index} className="flex justify-between">
-                  <span>
-                    {detail.menu.name} x{detail.amount}
-                  </span>
-                  <span>
-                    Rp{(detail.menu.price * detail.amount).toLocaleString()}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <hr className="my-4" />
-            <div className="text-right">
               <p>
-                <strong>Subtotal:</strong> Rp
-                {selectedTransaction?.detail_transaksi
-                  ?.reduce(
-                    (sum, detail) => sum + detail.menu.price * detail.amount,
-                    0
-                  )
-                  .toLocaleString()}
+                <strong>Tanggal:</strong>{" "}
+                {new Date(
+                  selectedTransaction?.tanggal_transaksi ?? ""
+                ).toLocaleDateString("id-ID")}
               </p>
-              {selectedTransaction.diskon && (
-                <>
-                  <p>
-                    <strong>Diskon ({selectedTransaction.diskon}%):</strong> Rp
-                    {(
-                      ((selectedTransaction.diskon ?? 0) / 100.0) *
-                      (selectedTransaction.detail_transaksi?.reduce(
-                        (sum, detail) =>
-                          sum + detail.menu.price * detail.amount,
-                        0
-                      ) ?? 0)
-                    ).toLocaleString()}
-                  </p>
-                </>
-              )}
-              <p className="font-bold">
-                <strong>Total Setelah Diskon:</strong> Rp
-                {selectedTransaction.total_harga?.toLocaleString()}
-              </p>
-            </div>
-            <div className="flex justify-end space-x-3 mt-6">
-              <button
-                onClick={() => setIsReceiptModalOpen(false)}
-                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
-              >
-                Tutup
-              </button>
-              <button
-                onClick={() => window.print()}
-                className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
-              >
-                Cetak
-              </button>
+              <hr className="my-4" />
+              <h3 className="text-md font-semibold mb-2">Detail Pesanan</h3>
+              <ul className="list-disc pl-6">
+                {selectedTransaction?.detail_transaksi?.map((detail, index) => (
+                  <li key={index} className="flex justify-between">
+                    <span>
+                      {detail.menu.name} x{detail.amount}
+                    </span>
+                    <span>
+                      Rp{(detail.menu.price * detail.amount).toLocaleString()}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <hr className="my-4" />
+              <div className="text-right">
+                <p>
+                  <strong>Subtotal:</strong> Rp
+                  {selectedTransaction?.detail_transaksi
+                    ?.reduce(
+                      (sum, detail) => sum + detail.menu.price * detail.amount,
+                      0
+                    )
+                    .toLocaleString()}
+                </p>
+                {selectedTransaction.diskon && (
+                  <>
+                    <p>
+                      <strong>Diskon ({selectedTransaction.diskon}%):</strong>{" "}
+                      Rp
+                      {(
+                        ((selectedTransaction.diskon ?? 0) / 100.0) *
+                        (selectedTransaction.detail_transaksi?.reduce(
+                          (sum, detail) =>
+                            sum + detail.menu.price * detail.amount,
+                          0
+                        ) ?? 0)
+                      ).toLocaleString()}
+                    </p>
+                  </>
+                )}
+                <p className="font-bold">
+                  <strong>Total Setelah Diskon:</strong> Rp
+                  {selectedTransaction.total_harga?.toLocaleString()}
+                </p>
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setIsReceiptModalOpen(false)}
+                  className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
+                >
+                  Tutup
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                >
+                  Cetak
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {isDeleteConfirmOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg w-[400px] p-6">
-            <h2 className="text-lg font-semibold mb-4">Konfirmasi Hapus</h2>
-            <p>Apakah Anda yakin ingin menghapus transaksi ini?</p>
-            <div className="flex justify-end space-x-3 mt-4">
-              <button
-                onClick={() => setIsDeleteConfirmOpen(false)}
-                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600"
-              >
-                Hapus
-              </button>
+        {isDeleteConfirmOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg w-[400px] p-6">
+              <h2 className="text-lg font-semibold mb-4">Konfirmasi Hapus</h2>
+              <p>Apakah Anda yakin ingin menghapus transaksi ini?</p>
+              <div className="flex justify-end space-x-3 mt-4">
+                <button
+                  onClick={() => setIsDeleteConfirmOpen(false)}
+                  className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600"
+                >
+                  Hapus
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </ProtectedRoute>
   );
 };
 

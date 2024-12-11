@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import SearchBar from "@/components/searchbar";
 import DynamicTable from "@/components/table/transaksi";
 import { toast } from "react-hot-toast";
+import ProtectedRoute from "@/components/protectedRoutes";
 
 type LevelMember = {
   level_member_id?: number; // Primary Key dari Prisma Schema
@@ -168,118 +169,123 @@ const LevelMemberPage = () => {
   };
 
   return (
-    <div className="p-6">
-      <SearchBar onSearch={handleSearch} onAdd={handleAdd} />
-      <DynamicTable
-        columns={levelMemberColumns}
-        data={filteredLevelMembers}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        idAccessor="level_member_id"
-      />
+    <ProtectedRoute allowedRoles={["owner"]}>
+      <div className="p-6">
+        <SearchBar onSearch={handleSearch} onAdd={handleAdd} />
+        <DynamicTable
+          columns={levelMemberColumns}
+          data={filteredLevelMembers}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          idAccessor="level_member_id"
+        />
 
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg w-[600px] p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">
-                {isEditMode ? "Edit Level Member" : "Tambah Level Member"}
-              </h2>
-              <button
-                onClick={handleModalClose}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                &times;
-              </button>
-            </div>
-            {errorMessage && (
-              <p className="text-red-500 text-sm mb-3">{errorMessage}</p>
-            )}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                Nama Level Member
-              </label>
-              <input
-                type="text"
-                placeholder="Nama Level Member"
-                className="border border-gray-300 rounded-md w-full p-2 mb-3"
-                value={newLevelMember.name}
-                onChange={(e) =>
-                  setNewLevelMember({ ...newLevelMember, name: e.target.value })
-                }
-              />
-              <label className="block text-sm font-medium mb-1">
-                Diskon (%)
-              </label>
-              <input
-                type="number"
-                placeholder="Diskon"
-                className="border border-gray-300 rounded-md w-full p-2 mb-3"
-                value={newLevelMember.diskon}
-                onChange={(e) =>
-                  setNewLevelMember({
-                    ...newLevelMember,
-                    diskon: parseInt(e.target.value),
-                  })
-                }
-              />
-              <label className="block text-sm font-medium mb-1">
-                Minimum Point
-              </label>
-              <input
-                type="number"
-                placeholder="Minimum Point"
-                className="border border-gray-300 rounded-md w-full p-2"
-                value={newLevelMember.minimum_point}
-                onChange={(e) =>
-                  setNewLevelMember({
-                    ...newLevelMember,
-                    minimum_point: parseInt(e.target.value),
-                  })
-                }
-              />
-            </div>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={handleModalClose}
-                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleModalSubmit}
-                className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
-              >
-                {isEditMode ? "Update" : "Tambah"}
-              </button>
+        {isModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg w-[600px] p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">
+                  {isEditMode ? "Edit Level Member" : "Tambah Level Member"}
+                </h2>
+                <button
+                  onClick={handleModalClose}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  &times;
+                </button>
+              </div>
+              {errorMessage && (
+                <p className="text-red-500 text-sm mb-3">{errorMessage}</p>
+              )}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Nama Level Member
+                </label>
+                <input
+                  type="text"
+                  placeholder="Nama Level Member"
+                  className="border border-gray-300 rounded-md w-full p-2 mb-3"
+                  value={newLevelMember.name}
+                  onChange={(e) =>
+                    setNewLevelMember({
+                      ...newLevelMember,
+                      name: e.target.value,
+                    })
+                  }
+                />
+                <label className="block text-sm font-medium mb-1">
+                  Diskon (%)
+                </label>
+                <input
+                  type="number"
+                  placeholder="Diskon"
+                  className="border border-gray-300 rounded-md w-full p-2 mb-3"
+                  value={newLevelMember.diskon}
+                  onChange={(e) =>
+                    setNewLevelMember({
+                      ...newLevelMember,
+                      diskon: parseInt(e.target.value),
+                    })
+                  }
+                />
+                <label className="block text-sm font-medium mb-1">
+                  Minimum Point
+                </label>
+                <input
+                  type="number"
+                  placeholder="Minimum Point"
+                  className="border border-gray-300 rounded-md w-full p-2"
+                  value={newLevelMember.minimum_point}
+                  onChange={(e) =>
+                    setNewLevelMember({
+                      ...newLevelMember,
+                      minimum_point: parseInt(e.target.value),
+                    })
+                  }
+                />
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={handleModalClose}
+                  className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleModalSubmit}
+                  className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                >
+                  {isEditMode ? "Update" : "Tambah"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {isDeleteConfirmOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg w-[400px] p-6">
-            <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
-            <p>Are you sure you want to delete this Level Member?</p>
-            <div className="flex justify-end space-x-3 mt-4">
-              <button
-                onClick={() => setIsDeleteConfirmOpen(false)}
-                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600"
-              >
-                Delete
-              </button>
+        {isDeleteConfirmOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg w-[400px] p-6">
+              <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
+              <p>Are you sure you want to delete this Level Member?</p>
+              <div className="flex justify-end space-x-3 mt-4">
+                <button
+                  onClick={() => setIsDeleteConfirmOpen(false)}
+                  className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </ProtectedRoute>
   );
 };
 

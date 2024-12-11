@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import SearchBar from "@/components/searchbar";
 import DynamicTable from "@/components/table/transaksi";
 import { toast } from "react-hot-toast";
+import ProtectedRoute from "@/components/protectedRoutes";
 
 type Employee = {
   pegawai_id?: number; // Primary Key dari Prisma Schema
@@ -190,125 +191,131 @@ const PegawaiPage = () => {
   };
 
   return (
-    <div className="p-6">
-      <SearchBar onSearch={handleSearch} onAdd={handleAdd} />
-      <DynamicTable
-        columns={employeeColumns}
-        data={filteredEmployees}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        idAccessor="pegawai_id"
-      />
+    <ProtectedRoute allowedRoles={["owner"]}>
+      <div className="p-6">
+        <SearchBar onSearch={handleSearch} onAdd={handleAdd} />
+        <DynamicTable
+          columns={employeeColumns}
+          data={filteredEmployees}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          idAccessor="pegawai_id"
+        />
 
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg w-[600px] p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">
-                {isEditMode ? "Edit Pegawai" : "Tambah Pegawai"}
-              </h2>
-              <button
-                onClick={handleModalClose}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                &times;
-              </button>
-            </div>
-            {errorMessage && (
-              <p className="text-red-500 text-sm mb-3">{errorMessage}</p>
-            )}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                Nama Pegawai
-              </label>
-              <input
-                type="text"
-                placeholder="Nama Pegawai"
-                className="border border-gray-300 rounded-md w-full p-2 mb-3"
-                value={newEmployee.name}
-                onChange={(e) =>
-                  setNewEmployee({ ...newEmployee, name: e.target.value })
-                }
-              />
-              <label className="block text-sm font-medium mb-1">Username</label>
-              <input
-                type="text"
-                placeholder="Username"
-                className="border border-gray-300 rounded-md w-full p-2 mb-3"
-                value={newEmployee.username}
-                onChange={(e) =>
-                  setNewEmployee({ ...newEmployee, username: e.target.value })
-                }
-              />
-              <label className="block text-sm font-medium mb-1">Password</label>
-              <input
-                type="password"
-                placeholder="Password"
-                className="border border-gray-300 rounded-md w-full p-2 mb-3"
-                value={newEmployee.password}
-                onChange={(e) =>
-                  setNewEmployee({ ...newEmployee, password: e.target.value })
-                }
-              />
-              <label className="block text-sm font-medium mb-1">Role</label>
-              <select
-                className="border border-gray-300 rounded-md w-full p-2"
-                value={newEmployee.role_id}
-                onChange={(e) =>
-                  setNewEmployee({
-                    ...newEmployee,
-                    role_id: parseInt(e.target.value),
-                  })
-                }
-              >
-                {roles.map((role) => (
-                  <option key={role.role_id} value={role.role_id}>
-                    {role.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={handleModalClose}
-                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleModalSubmit}
-                className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
-              >
-                {isEditMode ? "Update" : "Tambah"}
-              </button>
+        {isModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg w-[600px] p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">
+                  {isEditMode ? "Edit Pegawai" : "Tambah Pegawai"}
+                </h2>
+                <button
+                  onClick={handleModalClose}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  &times;
+                </button>
+              </div>
+              {errorMessage && (
+                <p className="text-red-500 text-sm mb-3">{errorMessage}</p>
+              )}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Nama Pegawai
+                </label>
+                <input
+                  type="text"
+                  placeholder="Nama Pegawai"
+                  className="border border-gray-300 rounded-md w-full p-2 mb-3"
+                  value={newEmployee.name}
+                  onChange={(e) =>
+                    setNewEmployee({ ...newEmployee, name: e.target.value })
+                  }
+                />
+                <label className="block text-sm font-medium mb-1">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  placeholder="Username"
+                  className="border border-gray-300 rounded-md w-full p-2 mb-3"
+                  value={newEmployee.username}
+                  onChange={(e) =>
+                    setNewEmployee({ ...newEmployee, username: e.target.value })
+                  }
+                />
+                <label className="block text-sm font-medium mb-1">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="Password"
+                  className="border border-gray-300 rounded-md w-full p-2 mb-3"
+                  value={newEmployee.password}
+                  onChange={(e) =>
+                    setNewEmployee({ ...newEmployee, password: e.target.value })
+                  }
+                />
+                <label className="block text-sm font-medium mb-1">Role</label>
+                <select
+                  className="border border-gray-300 rounded-md w-full p-2"
+                  value={newEmployee.role_id}
+                  onChange={(e) =>
+                    setNewEmployee({
+                      ...newEmployee,
+                      role_id: parseInt(e.target.value),
+                    })
+                  }
+                >
+                  {roles.map((role) => (
+                    <option key={role.role_id} value={role.role_id}>
+                      {role.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={handleModalClose}
+                  className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleModalSubmit}
+                  className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                >
+                  {isEditMode ? "Update" : "Tambah"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {isDeleteConfirmOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg w-[400px] p-6">
-            <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
-            <p>Are you sure you want to delete this employee?</p>
-            <div className="flex justify-end space-x-3 mt-4">
-              <button
-                onClick={() => setIsDeleteConfirmOpen(false)}
-                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600"
-              >
-                Delete
-              </button>
+        {isDeleteConfirmOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg w-[400px] p-6">
+              <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
+              <p>Are you sure you want to delete this employee?</p>
+              <div className="flex justify-end space-x-3 mt-4">
+                <button
+                  onClick={() => setIsDeleteConfirmOpen(false)}
+                  className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </ProtectedRoute>
   );
 };
 

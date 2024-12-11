@@ -46,7 +46,7 @@ const HomePage = () => {
   const handleLogout = useCallback(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem("isLoginSuccess", "false");
-      router.push("/");
+      router.push("/auth/login");
       window.location.reload();
     }
   }, [router]);
@@ -107,7 +107,7 @@ const HomePage = () => {
             <button
               onClick={() => {
                 setIsLoggedIn(true);
-                router.push("/dashboard");
+                router.push("/auth/login");
               }}
               className="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg font-semibold"
             >

@@ -1,5 +1,3 @@
-import Sidebar from "@/components/sidebar";
-import Navbar from "@/components/navbar";
 import ToastProvider from "@/components/toast/toastprovider";
 import "./globals.css";
 

@@ -1,6 +1,7 @@
 "use client";
 
 import BarChart from "@/components/chart/chart";
+import ProtectedRoute from "@/components/protectedRoutes";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 
@@ -108,207 +109,213 @@ export default function LaporanPenjualan() {
   }, [month, year]);
 
   return (
-    <div
-      style={{
-        fontFamily: "Arial, sans-serif",
-        padding: "20px",
-        maxWidth: "900px",
-        margin: "0 auto",
-      }}
-    >
-      <h1
-        style={{ textAlign: "center", marginBottom: "30px", fontSize: "24px" }}
-      >
-        Laporan Penjualan Bulanan
-      </h1>
-
-      {/* Filter */}
+    <ProtectedRoute allowedRoles={["owner"]}>
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: "20px",
-          marginBottom: "30px",
+          fontFamily: "Arial, sans-serif",
+          padding: "20px",
+          maxWidth: "900px",
+          margin: "0 auto",
         }}
       >
-        <div>
-          <label>Bulan:</label>
-          <select
-            value={month}
-            onChange={(e) => setMonth(Number(e.target.value))}
-            style={{ padding: "10px", fontSize: "16px", marginLeft: "10px" }}
+        <h1
+          style={{
+            textAlign: "center",
+            marginBottom: "30px",
+            fontSize: "24px",
+          }}
+        >
+          Laporan Penjualan Bulanan
+        </h1>
+
+        {/* Filter */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "20px",
+            marginBottom: "30px",
+          }}
+        >
+          <div>
+            <label>Bulan:</label>
+            <select
+              value={month}
+              onChange={(e) => setMonth(Number(e.target.value))}
+              style={{ padding: "10px", fontSize: "16px", marginLeft: "10px" }}
+            >
+              {months.map((month, index) => (
+                <option key={index} value={index + 1}>
+                  {month}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label>Tahun:</label>
+            <select
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+              style={{ padding: "10px", fontSize: "16px", marginLeft: "10px" }}
+            >
+              {Array.from(
+                { length: 10 },
+                (_, i) => new Date().getFullYear() - i
+              ).map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={fetchReport}
+            style={{
+              padding: "10px 20px",
+              fontSize: "16px",
+              backgroundColor: "#007bff",
+              color: "#fff",
+              border: "none",
+              cursor: "pointer",
+            }}
           >
-            {months.map((month, index) => (
-              <option key={index} value={index + 1}>
-                {month}
-              </option>
-            ))}
-          </select>
+            Tampilkan Laporan
+          </button>
         </div>
 
-        <div>
-          <label>Tahun:</label>
-          <select
-            value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
-            style={{ padding: "10px", fontSize: "16px", marginLeft: "10px" }}
-          >
-            {Array.from(
-              { length: 10 },
-              (_, i) => new Date().getFullYear() - i
-            ).map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-        </div>
-
+        {/* Export Button */}
         <button
-          onClick={fetchReport}
+          onClick={exportToExcel}
           style={{
             padding: "10px 20px",
             fontSize: "16px",
-            backgroundColor: "#007bff",
+            backgroundColor: "#28a745",
             color: "#fff",
             border: "none",
             cursor: "pointer",
+            marginBottom: "30px",
           }}
         >
-          Tampilkan Laporan
+          Export ke Excel
         </button>
-      </div>
+        {/* Loading & Report */}
+        {loading ? (
+          <p style={{ textAlign: "center" }}>Loading...</p>
+        ) : data ? (
+          <div>
+            {/* Ringkasan */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "20px",
+                marginBottom: "30px",
+              }}
+            >
+              <div
+                style={{
+                  border: "1px solid #ddd",
+                  padding: "20px",
+                  borderRadius: "10px",
+                  textAlign: "center",
+                }}
+              >
+                <h3>Total Transaksi</h3>
+                <p>{data.totalTransactions}</p>
+              </div>
+              <div
+                style={{
+                  border: "1px solid #ddd",
+                  padding: "20px",
+                  borderRadius: "10px",
+                  textAlign: "center",
+                }}
+              >
+                <h3>Total Pendapatan</h3>
+                <p>Rp {data.totalRevenue}</p>
+              </div>
+              <div
+                style={{
+                  border: "1px solid #ddd",
+                  padding: "20px",
+                  borderRadius: "10px",
+                  textAlign: "center",
+                }}
+              >
+                <h3>Total Diskon</h3>
+                <p>Rp {data.totalDiscount}</p>
+              </div>
+            </div>
 
-      {/* Export Button */}
-      <button
-        onClick={exportToExcel}
-        style={{
-          padding: "10px 20px",
-          fontSize: "16px",
-          backgroundColor: "#28a745",
-          color: "#fff",
-          border: "none",
-          cursor: "pointer",
-          marginBottom: "30px",
-        }}
-      >
-        Export ke Excel
-      </button>
-      {/* Loading & Report */}
-      {loading ? (
-        <p style={{ textAlign: "center" }}>Loading...</p>
-      ) : data ? (
-        <div>
-          {/* Ringkasan */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "20px",
-              marginBottom: "30px",
-            }}
-          >
-            <div
+            {/* Detail Penjualan */}
+            <h2 style={{ marginBottom: "20px" }}>Detail Penjualan</h2>
+            <table
               style={{
-                border: "1px solid #ddd",
-                padding: "20px",
-                borderRadius: "10px",
-                textAlign: "center",
+                width: "100%",
+                borderCollapse: "collapse",
+                boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.1)",
+                marginBottom: "20px",
               }}
             >
-              <h3>Total Transaksi</h3>
-              <p>{data.totalTransactions}</p>
-            </div>
-            <div
-              style={{
-                border: "1px solid #ddd",
-                padding: "20px",
-                borderRadius: "10px",
-                textAlign: "center",
-              }}
-            >
-              <h3>Total Pendapatan</h3>
-              <p>Rp {data.totalRevenue}</p>
-            </div>
-            <div
-              style={{
-                border: "1px solid #ddd",
-                padding: "20px",
-                borderRadius: "10px",
-                textAlign: "center",
-              }}
-            >
-              <h3>Total Diskon</h3>
-              <p>Rp {data.totalDiscount}</p>
-            </div>
-          </div>
-
-          {/* Detail Penjualan */}
-          <h2 style={{ marginBottom: "20px" }}>Detail Penjualan</h2>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.1)",
-              marginBottom: "20px",
-            }}
-          >
-            <thead>
-              <tr>
-                <th
-                  style={{
-                    border: "1px solid #ddd",
-                    padding: "10px",
-                    textAlign: "left",
-                    backgroundColor: "#f8f8f8",
-                  }}
-                >
-                  Item
-                </th>
-                <th
-                  style={{
-                    border: "1px solid #ddd",
-                    padding: "10px",
-                    textAlign: "left",
-                    backgroundColor: "#f8f8f8",
-                  }}
-                >
-                  Jumlah
-                </th>
-                <th
-                  style={{
-                    border: "1px solid #ddd",
-                    padding: "10px",
-                    textAlign: "left",
-                    backgroundColor: "#f8f8f8",
-                  }}
-                >
-                  Pendapatan
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.values(data.items).map((item: any, index) => (
-                <tr key={index}>
-                  <td style={{ border: "1px solid #ddd", padding: "10px" }}>
-                    {item.name}
-                  </td>
-                  <td style={{ border: "1px solid #ddd", padding: "10px" }}>
-                    {item.amount}
-                  </td>
-                  <td style={{ border: "1px solid #ddd", padding: "10px" }}>
-                    Rp {item.revenue}
-                  </td>
+              <thead>
+                <tr>
+                  <th
+                    style={{
+                      border: "1px solid #ddd",
+                      padding: "10px",
+                      textAlign: "left",
+                      backgroundColor: "#f8f8f8",
+                    }}
+                  >
+                    Item
+                  </th>
+                  <th
+                    style={{
+                      border: "1px solid #ddd",
+                      padding: "10px",
+                      textAlign: "left",
+                      backgroundColor: "#f8f8f8",
+                    }}
+                  >
+                    Jumlah
+                  </th>
+                  <th
+                    style={{
+                      border: "1px solid #ddd",
+                      padding: "10px",
+                      textAlign: "left",
+                      backgroundColor: "#f8f8f8",
+                    }}
+                  >
+                    Pendapatan
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p style={{ textAlign: "center" }}>Data tidak tersedia.</p>
-      )}
-      <div className="h-12"></div>
-      <BarChart items={data?.items || []} />
-    </div>
+              </thead>
+              <tbody>
+                {Object.values(data.items).map((item: any, index) => (
+                  <tr key={index}>
+                    <td style={{ border: "1px solid #ddd", padding: "10px" }}>
+                      {item.name}
+                    </td>
+                    <td style={{ border: "1px solid #ddd", padding: "10px" }}>
+                      {item.amount}
+                    </td>
+                    <td style={{ border: "1px solid #ddd", padding: "10px" }}>
+                      Rp {item.revenue}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p style={{ textAlign: "center" }}>Data tidak tersedia.</p>
+        )}
+        <div className="h-12"></div>
+        <BarChart items={data?.items || []} />
+      </div>
+    </ProtectedRoute>
   );
 }

@@ -1,18 +1,49 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [roleName, setRoleName] = useState<string | null>(null);
 
+  useEffect(() => {
+    // Periksa status login dan role_name dari localStorage
+    const loginStatus = localStorage.getItem("isLoginSuccess") === "true";
+    const userData = localStorage.getItem("user");
+    if (loginStatus && userData) {
+      const user = JSON.parse(userData);
+      setRoleName(user.role);
+      console.log("roleName", user.role);
+    }
+    setIsLoggedIn(loginStatus);
+
+    // Jika belum login, redirect ke halaman login
+    if (!loginStatus) {
+      router.push("/auth/login");
+    }
+  }, [router]);
+
+  if (!isLoggedIn) {
+    // Jangan tampilkan apa-apa jika belum login
+    return null;
+  }
+
+  // Tentukan menu berdasarkan role
   const menuItems = [
-    { name: "Kelola Data Transaksi", path: "/transaksi" },
-    { name: "Kelola Data Customer", path: "/customer" },
-    { name: "Kelola Data Menu", path: "/menu" },
-    { name: "Kelola Data Pegawai", path: "/pegawai" },
-    { name: "Kelola Level", path: "/level_member" },
-    { name: "Laporan Penjualan", path: "/laporan_penjualan" },
+    ...(roleName === "owner" || roleName === "kasir"
+      ? [{ name: "Kelola Data Transaksi", path: "/dashboard/transaksi" }]
+      : []),
+    ...(roleName === "owner"
+      ? [
+          { name: "Kelola Data Customer", path: "/dashboard/customer" },
+          { name: "Kelola Data Menu", path: "/dashboard/menu" },
+          { name: "Kelola Data Pegawai", path: "/dashboard/pegawai" },
+          { name: "Kelola Level", path: "/dashboard/level_member" },
+          { name: "Laporan Penjualan", path: "/dashboard/laporan_penjualan" },
+        ]
+      : []),
   ];
 
   return (

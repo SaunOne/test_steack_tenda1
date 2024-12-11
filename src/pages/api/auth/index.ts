@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
-import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
@@ -10,40 +9,22 @@ const methods: Record<
 > = {
   POST: async (req, res) => {
     const { username, password } = req.body;
-    console.log("req.body", req.body);
     try {
       const pegawai = await prisma.pegawai.findUnique({
         where: { username },
+        include: { role: true }, // Tambahkan relasi role
       });
-      if (!pegawai) {
+
+      if (!pegawai || pegawai.password !== password) {
         return res.status(401).json({ error: "Invalid username or password" });
       }
-
-      // const isPasswordCorrect = password === pegawai.password;
-
-      // if (!isPasswordCorrect) {
-      //   return res.status(401).json({ error: "Invalid username or password" });
-      // }
-
-      if (password !== pegawai.password) {
-        return res.status(401).json({ error: "Invalid username or password" });
-      }
-
-      // const token = jwt.sign(
-      //   {
-      //     pegawai_id: pegawai.pegawai_id,
-      //     nama: pegawai.nama,
-      //     akses_menu: pegawai.akses_menu,
-      //   },
-      //   process.env.JWT_SECRET as string,
-      //   { expiresIn: "1h" }
-      // );
 
       res.status(200).json({
         message: "Login successful",
         pegawai: {
-          pegawai_id: pegawai.pegawai_id ?? "",
-          name: pegawai.name ?? "",
+          pegawai_id: pegawai.pegawai_id,
+          name: pegawai.name,
+          role: pegawai.role.name, // Sertakan role name
         },
       });
     } catch (error) {

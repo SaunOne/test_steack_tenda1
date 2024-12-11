@@ -93,7 +93,7 @@ const HomePage = () => {
       <nav className="bg-red-600 text-white p-4 shadow-md flex justify-between items-center">
         <div className="text-2xl font-bold">SteakTenda</div>
         <div className="flex items-center gap-6">
-          <a href="/transaksi" className="hover:underline text-lg">
+          <a href="/dashboard/transaksi" className="hover:underline text-lg">
             Admin
           </a>
           {isLoggedIn ? (

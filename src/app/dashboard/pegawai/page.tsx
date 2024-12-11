@@ -1,7 +1,7 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import SearchBar from '@/components/searchbar';
-import DynamicTable from '@/components/table/transaksi';
+"use client";
+import React, { useEffect, useState } from "react";
+import SearchBar from "@/components/searchbar";
+import DynamicTable from "@/components/table/transaksi";
 import { toast } from "react-hot-toast";
 
 type Employee = {
@@ -17,44 +17,52 @@ type Employee = {
 const PegawaiPage = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [newEmployee, setNewEmployee] = useState<Employee>({ name: '', username: '', password: '', role_id: 1 });
+  const [newEmployee, setNewEmployee] = useState<Employee>({
+    name: "",
+    username: "",
+    password: "",
+    role_id: 1,
+  });
   const [roles, setRoles] = useState<{ role_id: number; name: string }[]>([]); // List Role
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const employeeColumns = [
-    { header: 'No', accessor: 'index' },
-    { header: 'Nama Pegawai', accessor: 'name' },
-    { header: 'Username', accessor: 'username' },
-    { header: 'Role', accessor: 'role_name' },
+    { header: "No", accessor: "index" },
+    { header: "Nama Pegawai", accessor: "name" },
+    { header: "Username", accessor: "username" },
+    { header: "Role", accessor: "role_name" },
   ];
 
   // Fetch data Pegawai dari API
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('/api/pegawai'); // Endpoint API Pegawai
+      const response = await fetch("/api/pegawai"); // Endpoint API Pegawai
       const data: Employee[] = await response.json();
-      const employeesWithIndex = data.map((item, index) => ({ ...item, index: index + 1 }));
+      const employeesWithIndex = data.map((item, index) => ({
+        ...item,
+        index: index + 1,
+      }));
       setEmployees(employeesWithIndex);
       setFilteredEmployees(employeesWithIndex);
     } catch (error) {
-      console.error('Failed to fetch employees:', error);
+      console.error("Failed to fetch employees:", error);
     }
   };
 
   // Fetch data Role untuk Dropdown
   const fetchRoles = async () => {
     try {
-      const response = await fetch('/api/role'); // Endpoint API Role
+      const response = await fetch("/api/role"); // Endpoint API Role
       const data = await response.json();
       console.log(data);
       setRoles(data);
     } catch (error) {
-      console.error('Failed to fetch roles:', error);
+      console.error("Failed to fetch roles:", error);
     }
   };
 
@@ -81,7 +89,12 @@ const PegawaiPage = () => {
   const handleAdd = () => {
     setIsModalOpen(true);
     setIsEditMode(false);
-    setNewEmployee({ name: '', username: '', password: '', role_id: roles[0]?.role_id || 1 });
+    setNewEmployee({
+      name: "",
+      username: "",
+      password: "",
+      role_id: roles[0]?.role_id || 1,
+    });
   };
 
   const handleEdit = (pegawai_id: number) => {
@@ -102,28 +115,34 @@ const PegawaiPage = () => {
   const confirmDelete = async () => {
     if (selectedId !== null) {
       try {
-        await fetch('/api/pegawai', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
+        await fetch("/api/pegawai", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ pegawai_id: selectedId }),
         });
-        const updatedEmployees = employees.filter((employee) => employee.pegawai_id !== selectedId)
+        const updatedEmployees = employees
+          .filter((employee) => employee.pegawai_id !== selectedId)
           .map((item, index) => ({ ...item, index: index + 1 }));
         setEmployees(updatedEmployees);
         setFilteredEmployees(updatedEmployees);
         setIsDeleteConfirmOpen(false);
         setSelectedId(null);
-        toast.success('Pegawai berhasil dihapus!');
+        toast.success("Pegawai berhasil dihapus!");
       } catch (error) {
-        console.error('Failed to delete employee:', error);
+        console.error("Failed to delete employee:", error);
       }
     }
   };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setNewEmployee({ name: '', username: '', password: '', role_id: roles[0]?.role_id || 1 });
-    setErrorMessage('');
+    setNewEmployee({
+      name: "",
+      username: "",
+      password: "",
+      role_id: roles[0]?.role_id || 1,
+    });
+    setErrorMessage("");
   };
 
   const handleModalSubmit = async () => {
@@ -131,15 +150,15 @@ const PegawaiPage = () => {
 
     // Validasi
     if (!name.trim() || !username.trim() || !password.trim()) {
-      setErrorMessage('Semua field harus diisi.');
+      setErrorMessage("Semua field harus diisi.");
       return;
     }
 
     try {
       if (isEditMode && selectedId !== null) {
-        const response = await fetch('/api/pegawai', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/pegawai", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ pegawai_id: selectedId, ...newEmployee }),
         });
         const updatedEmployee = await response.json();
@@ -148,25 +167,25 @@ const PegawaiPage = () => {
         );
         setEmployees(updatedEmployees);
         setFilteredEmployees(updatedEmployees);
-        toast.success('Pegawai berhasil diperbarui!');
+        toast.success("Pegawai berhasil diperbarui!");
       } else {
-        const response = await fetch('/api/pegawai', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/pegawai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newEmployee),
         });
         if (response.status === 409) {
-          toast.error('Username harus unik!');
+          toast.error("Username harus unik!");
           return;
         }
         const newCreatedEmployee = await response.json();
         setEmployees([...employees, newCreatedEmployee]);
         setFilteredEmployees([...employees, newCreatedEmployee]);
-        toast.success('Pegawai berhasil ditambahkan!');
+        toast.success("Pegawai berhasil ditambahkan!");
       }
       handleModalClose();
     } catch (error) {
-      console.error('Failed to save employee:', error);
+      console.error("Failed to save employee:", error);
     }
   };
 
@@ -185,20 +204,31 @@ const PegawaiPage = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg w-[600px] p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">{isEditMode ? 'Edit Pegawai' : 'Tambah Pegawai'}</h2>
-              <button onClick={handleModalClose} className="text-gray-500 hover:text-gray-700">
+              <h2 className="text-lg font-semibold">
+                {isEditMode ? "Edit Pegawai" : "Tambah Pegawai"}
+              </h2>
+              <button
+                onClick={handleModalClose}
+                className="text-gray-500 hover:text-gray-700"
+              >
                 &times;
               </button>
             </div>
-            {errorMessage && <p className="text-red-500 text-sm mb-3">{errorMessage}</p>}
+            {errorMessage && (
+              <p className="text-red-500 text-sm mb-3">{errorMessage}</p>
+            )}
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Nama Pegawai</label>
+              <label className="block text-sm font-medium mb-1">
+                Nama Pegawai
+              </label>
               <input
                 type="text"
                 placeholder="Nama Pegawai"
                 className="border border-gray-300 rounded-md w-full p-2 mb-3"
                 value={newEmployee.name}
-                onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
+                onChange={(e) =>
+                  setNewEmployee({ ...newEmployee, name: e.target.value })
+                }
               />
               <label className="block text-sm font-medium mb-1">Username</label>
               <input
@@ -206,7 +236,9 @@ const PegawaiPage = () => {
                 placeholder="Username"
                 className="border border-gray-300 rounded-md w-full p-2 mb-3"
                 value={newEmployee.username}
-                onChange={(e) => setNewEmployee({ ...newEmployee, username: e.target.value })}
+                onChange={(e) =>
+                  setNewEmployee({ ...newEmployee, username: e.target.value })
+                }
               />
               <label className="block text-sm font-medium mb-1">Password</label>
               <input
@@ -214,13 +246,20 @@ const PegawaiPage = () => {
                 placeholder="Password"
                 className="border border-gray-300 rounded-md w-full p-2 mb-3"
                 value={newEmployee.password}
-                onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })}
+                onChange={(e) =>
+                  setNewEmployee({ ...newEmployee, password: e.target.value })
+                }
               />
               <label className="block text-sm font-medium mb-1">Role</label>
               <select
                 className="border border-gray-300 rounded-md w-full p-2"
                 value={newEmployee.role_id}
-                onChange={(e) => setNewEmployee({ ...newEmployee, role_id: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setNewEmployee({
+                    ...newEmployee,
+                    role_id: parseInt(e.target.value),
+                  })
+                }
               >
                 {roles.map((role) => (
                   <option key={role.role_id} value={role.role_id}>
@@ -240,7 +279,7 @@ const PegawaiPage = () => {
                 onClick={handleModalSubmit}
                 className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
               >
-                {isEditMode ? 'Update' : 'Tambah'}
+                {isEditMode ? "Update" : "Tambah"}
               </button>
             </div>
           </div>

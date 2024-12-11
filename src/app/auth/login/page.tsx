@@ -1,7 +1,6 @@
-// pages/login.tsx
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation"; // Adjusted for Next.js's latest router API
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 export default function Login() {
@@ -14,8 +13,6 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      // Send login request to API
-
       const response = await fetch("/api/auth", {
         method: "POST",
         headers: {
@@ -24,16 +21,14 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
       });
 
-      console.log(response);
       if (response.ok) {
         const data = await response.json();
-
-        // Save the token in local storage
+        // Simpan status login dan data pengguna di localStorage
         localStorage.setItem("isLoginSuccess", "true");
-        console.log("Login successful:", data);
+        localStorage.setItem("user", JSON.stringify(data.pegawai));
+        localStorage.setItem("role", JSON.stringify(data.pegawai));
         toast.success("Login Berhasil!");
-        // Redirect to the dashboard on successful login
-        router.push("/home");
+        router.push("/dashboard/transaksi"); // Reload the page
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Invalid username or password.");
@@ -47,22 +42,16 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
       <header className="bg-red-700 text-white py-4 text-center">
         <h1 className="text-2xl font-semibold">Steak Tenda 2</h1>
       </header>
-
-      {/* Login Form */}
       <main className="flex-grow flex items-center justify-center bg-gray-100">
         <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-2xl font-bold text-center text-red-700 mb-6">
             Login
           </h2>
-
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-
           <form onSubmit={handleSubmit}>
-            {/* Username Field */}
             <div className="mb-4">
               <label
                 htmlFor="username"
@@ -79,8 +68,6 @@ export default function Login() {
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
               />
             </div>
-
-            {/* Password Field */}
             <div className="mb-6">
               <label
                 htmlFor="password"
@@ -97,8 +84,6 @@ export default function Login() {
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
               />
             </div>
-
-            {/* Login Button */}
             <button
               type="submit"
               className="w-full bg-red-700 text-white py-2 rounded-lg font-semibold hover:bg-red-800 transition duration-200"
@@ -106,13 +91,6 @@ export default function Login() {
               Login
             </button>
           </form>
-
-          {/* Optional Forgot Password Link */}
-          <div className="text-center mt-4">
-            <a href="#" className="text-sm text-red-700 hover:underline">
-              Forgot Password?
-            </a>
-          </div>
         </div>
       </main>
     </div>

@@ -1,51 +1,63 @@
-'use client';
-import React, { useCallback, useState } from "react";
-import { useRouter } from 'next/navigation';
-import Image from "next/image";
+"use client";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+type User = {
+  name: string;
+  role: string;
+};
 
 const Navbar: React.FC = () => {
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const handleLogout = useCallback(() => {
-    if (typeof window !== "undefined") {
-      // Remove login status from localStorage
-      localStorage.setItem("isLoginSuccess", "false");
-      // Redirect to dashboard or login page
-      router.push("/");
-      // Force a full page reload to clear client-side state
-      window.location.reload();
+  useEffect(() => {
+    // Periksa status login dan data pengguna
+    const loginStatus = localStorage.getItem("isLoginSuccess") === "true";
+    if (!loginStatus) {
+      router.push("/auth/login");
+    } else {
+      // Ambil data pengguna dari localStorage
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        setUser(JSON.parse(userData));
+      }
     }
   }, [router]);
+  const handleLogout = () => {
+    // Hapus data login dari localStorage
+    localStorage.removeItem("isLoginSuccess");
+    localStorage.removeItem("user");
+    router.push("/auth/login");
+    router.refresh(); // Reload the page to ensure all components are reset
+  };
 
   const confirmLogout = () => {
-    setShowModal(true); // Show the confirmation modal
+    setShowModal(true);
   };
 
   const cancelLogout = () => {
-    setShowModal(false); // Hide the confirmation modal if user cancels
+    setShowModal(false);
   };
+
+  if (!user) {
+    return null; // Jangan tampilkan navbar jika pengguna belum login
+  }
 
   return (
     <>
-      <nav className="flex items-center justify-end p-4 bg-red-700 text-white">
-        <div className="flex items-center space-x-4">
-          <span>Welcome, User!</span>
-          {/* Uncomment to add profile image */}
-          {/* <Image
-            src="/profile.jpg"
-            alt="Profile"
-            width={40}
-            height={40}
-            className="rounded-full"
-          /> */}
-          <button
-            onClick={confirmLogout}
-            className="px-3 py-1 bg-white text-red-700 rounded hover:bg-gray-200"
-          >
-            Logout
-          </button>
+      <nav className="flex items-center justify-between p-4 bg-red-700 text-white">
+        <div>
+          <span className="font-bold">Welcome, {user.name}!</span>
+          <span className="ml-4">(Role: {user.role})</span>
         </div>
+        <button
+          onClick={confirmLogout}
+          className="px-3 py-1 bg-white text-red-700 rounded hover:bg-gray-200"
+        >
+          Logout
+        </button>
       </nav>
 
       {/* Confirmation Modal */}
